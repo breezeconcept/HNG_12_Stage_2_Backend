@@ -12,14 +12,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-        
+
 
       - name: Setup SSH Key and Known Hosts
         run: |
           echo "${{ secrets.AWS_PRIVATE_KEY }}" > aws-key.pem
           chmod 600 aws-key.pem
           mkdir -p ~/.ssh  # Ensure SSH directory exists
-          ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H 44.243.196.29 >> ~/.ssh/known_hosts
         
 
       - name: Deploy to AWS EC2
