@@ -1,4 +1,4 @@
-name: Deploy FastAPI Application
+name: CD - Deploy FastAPI App to AWS EC2
 
 on:
   push:
@@ -13,17 +13,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-
-      - name: Install Dependencies
+      - name: Setup SSH Key and Known Hosts
         run: |
-          python -m pip install --upgrade pip
+          echo "${{ secrets.AWS_PRIVATE_KEY }}" > aws-key.pem
+          chmod 600 aws-key.pem
+          ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to AWS EC2
+        run: |
+          ssh -i aws-key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+          cd /home/ubuntu/HNG_12_Stage_2_Backend  # Change this if needed
+          git pull origin main
+          source /home/ubuntu/ENV/bin/activate
           pip install -r requirements.txt
-
-      - name: Deploy Application
-        run: |
-          # Add deployment commands here based on your chosen platform
-          echo "Deployment step - update with actual commands"
+          sudo systemctl restart fastapi
+          sudo systemctl restart nginx
+          EOF
