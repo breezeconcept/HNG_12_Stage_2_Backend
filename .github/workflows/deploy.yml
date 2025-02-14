@@ -32,3 +32,6 @@ jobs:
           sudo systemctl restart fastapi
           sudo systemctl restart nginx
           EOF
+
+
+          
